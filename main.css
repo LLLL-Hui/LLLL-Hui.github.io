@@ -1,0 +1,168 @@
+* {
+    margin: 0;
+    font-family: "YuGothic","Hiragino Kaku Gothic Pro","Meiryo",sans-serif;
+    font-weight: 300;
+    color: #22262c;
+}
+
+nav {
+    padding: 0px 0px 10px 20px;
+}
+
+h1 {
+    padding: 20px;
+    font-size: 2rem;
+}
+
+h2.header {
+    position: relative;
+    width: 80%;
+    margin-left: 10px;
+    padding: 20px 0 10px 50px;
+    border-bottom: 1px solid #22262c;
+}
+
+h2.header:before {
+    content: "\25A1";
+    font-size: 2.0rem;
+    position: absolute;
+    color: #b9b9b9;
+    top: 0.3rem;
+    left: 0.5rem;
+    height: 12px;
+    width: 12px;
+}
+
+h2.header:after {
+    content: "\25A1";
+    font-size: 2.0rem;
+    position: absolute;
+    color: #3e3e3e;
+    top: 1.0rem;
+    left: 0.0rem;
+    height: 12px;
+    width: 12px;
+}
+
+h3.header {
+    position: relative;
+    width: 82%;
+    margin: 10px 0 10px 20px;
+    padding: 5px 0 0 20px;
+    font-weight: normal;
+    border-bottom: solid 1px black;
+    border-left: solid 6px black;
+}
+
+div.profile {
+    padding: 20px;
+    overflow: hidden;
+}
+
+img#profile-image {
+    border-radius: 20%;
+    border: solid 1px #989898;
+}
+
+div.short-note {
+    padding-left: 20px;
+}
+
+div.footnote {
+    position: relative;
+    width: 80%;
+    border-top: solid 1px black;
+    padding: 20px 0 20px 50px;
+    margin-left: 10px;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+div.float {
+    padding: 0px 10px 0px 10px;
+    float: left;
+}
+
+div.image-box {
+    padding: 10px 0px 0px 20px;
+    float: left;
+}
+
+div.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+a, a:visited { color: #888888 }
+a:hover { color: #cccccc; }
+
+p {
+    padding: 10px 10px 0px 10px;
+}
+
+p.image-title {
+    padding: 0px 0px 2px 0px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+    border-bottom: solid 1px #aaa;
+}
+
+ul, ol {
+    margin: 20px 0px 20px 30px;
+    font-size: 1rem;
+    padding: 0;
+}
+
+ul.padded-list, ol.padded-list {
+    margin: 0 0 20px 30px;
+    padding-left: 1.3rem;
+}
+
+.margin-list li {
+    margin-left: 1rem;
+}
+
+ul li, ol li {
+    padding: 1px;
+    width: 85%;
+}
+
+li.nostyle {
+    list-style: none;
+    padding-left: 1.2rem;
+    background-image: none;
+    background-size: 0.7rem;
+    background-repeat: no-repeat;
+    background-position: 0 0.4rem;
+}
+
+li.icon-briefcase { background-image: url(files/svg/briefcase.svg) }
+li.icon-badge { background-image: url(files/svg/badge.svg) }
+li.icon-chat { background-image: url(files/svg/double-quote-serif-right.svg) }
+li.icon-code { background-image: url(files/svg/terminal.svg) }
+li.icon-file { background-image: url(files/svg/file.svg) }
+li.icon-location { background-image: url(files/svg/location.svg) }
+li.icon-mail { background-image: url(files/svg/envelope-closed.svg) }
+li.icon-misc { background-image: url(files/svg/grid-three-up.svg) }
+li.icon-music { background-image: url(files/svg/musical-note.svg) }
+li.icon-study { background-image: url(files/svg/pencil.svg) }
+
+span.stress-note { color: #d00; font-weight: 900; }
+span.stress-author { text-decoration: underline; font-weight: 900; }
+span.hidden { color: white }
+span.hidden a { color: white }
+
+table { margin: 20px 20px 20px 20px }
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th {
+    font-weight: bold;
+    background-color: #bbb;
+}
+th, td { padding: 2px 5px 2px 5px }
+table tr:nth-child(even) { background-color: #fff }
+table tr:nth-child(odd) { background-color: #eee }
