@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="Han Bao">
+
+
+
+<meta name="description" content="I would like to summarize the contents of van de Geer (2000)1 one chapter by one, which is devoted for the theory of the empirical process and the convergence rates.
+In Chapter 2, the definitions of the empirical process and entropy are given.
+Empirical Measure As the number of samples gets larger, the estimation error will converge to zero in many cases. This convergence property is stated by the empirical process.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" computer science  machine learning  statistics ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+
+<link rel="canonical" href="https://hermite.jp/post/empirical-process-chapter-2/">
+
+
+
+
+<title>Empirical Process in M-Estimation (Chapter 2) - Han Bao</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/highlight.css'>
+
+  <link rel="stylesheet" href='https://hermite.jp/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://hermite.jp/">Han Bao</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/publication/">Publication</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/talk/">Talk</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/misc/">Misc</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/post/">Post</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      
+      <h1>Empirical Process in M-Estimation (Chapter 2)</h1>
+      
+      <time>2018-03-11</time>
+      <hr />
+      <div class="content">
+        
+        <p>I would like to summarize the contents of van de Geer (2000)<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> one chapter by one, which is devoted for the theory of the empirical process and the convergence rates.</p>
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=000000&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=levelfour-22&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=0521123259&linkId=e6fb3df82dc52ce3cad91f859e252b34"></iframe>
+<p>In Chapter 2, the definitions of the empirical process and entropy are given.</p>
+<h2 id="empirical-measure">Empirical Measure</h2>
+<p>As the number of samples gets larger, the estimation error will converge to zero in many cases.
+This convergence property is stated by the empirical process.
+First, let&rsquo;s begin with the definition of the empirical measure.</p>
+<p>Let $X_1, X_2, \dots$ be independent copies of a r.v. $X$ in a probability space $(\mathcal{X}, \mathcal{A}, P)$,
+and $\mathcal{G} \triangleq \{g: \mathcal{X} \rightarrow \mathbb{R}\}$ be a class of measurable functions on $\mathcal{X}$.
+The sample average can often be seen as an empirical expectation.
+Let $P_n$ be the <strong>empirical measure</strong> based on $X_1, \dots, X_n$, i.e., for each set $A \in \mathcal{A}$,
+$$
+P_n(A) \triangleq \frac{1}{n} \#\{X_i \mid X_i \in A\} = \frac{1}{n}\sum_{i=1}^n 1_A(X_i).
+$$
+Thus, $P_n$ put mass $\frac{1}{n}$ at each $X_i$:</p>
+<p>$$
+P_n = \frac{1}{n}\sum_{i=1}^n \delta_{X_i},
+$$
+where $\delta_{X_i}$ is a point mass at $X_i$.
+The below figure describes the intuition.
+<figure><img src="/img/201803/empirical_process.png" width="400px"/>
+</figure>
+</p>
+<h2 id="empirical-process">Empirical Process</h2>
+<p>Now we use the notation
+$$
+\int g dP_n \triangleq \frac{1}{n}\sum_{i=1}^ng(X_i).
+$$</p>
+<p>Then, the difference between the empirical average and expectation is
+$$
+\frac{1}{n}\sum_{i=1}^ng(X_i) - \mathbb{E}g(X) = \int gd(P_n - P).
+$$
+The set of this quantity indexed by the class $\mathcal{G}$ is called the <strong>empirical process</strong>:
+$$
+\left\{ \sqrt{n} \int gd(P_n - P) \right\}_{g \in \mathcal{G}}.
+$$</p>
+<p>In the empirical process theory, we study the <em>uniform convergence</em>, i.e., the empirical process converges to zero for any $g \in \mathcal{G}$.
+Then we obtain the <em>uniform law of large numbers (ULLN)</em> and <em>uniform central limit theorem</em>, compared with the classical ones.
+They are discussed in later chapters.</p>
+<h2 id="entropy">Entropy</h2>
+<p>In order to investigate whether a given class satisfies the ULLN and how fast the convergence is, the complexity of the function class is needed.
+In the theory of nonparametric estimation, the complexity measure called <strong>entropy</strong> is often used.
+Afterwards, we introduce three types of entropy:</p>
+<ul>
+<li>uniform entropy</li>
+<li>bracketing entropy</li>
+<li>entropy for the supremum norm</li>
+</ul>
+<h3 id="uniform-entropy">Uniform Entropy</h3>
+<p>Let $Q$ be a measure on $(\mathcal{X}, \mathcal{A})$,
+and $L_p(Q) \triangleq \{g: \mathcal{X} \rightarrow \mathbb{R} \mid \int |g|^pdQ &lt; \infty \}$ for $1 \le p &lt; \infty$.
+For $g \in L_p(Q)$, write
+$$
+\|g\|_{p,Q}^p \triangleq \int |g|^pdQ.
+$$
+$\|\cdot\|_{p,Q}$ is referred to as $L_p(Q)$-norm.
+$L_p(Q)$-metric between $g_1, g_2 \in L_p(Q)$ is defined as $\|g_1 - g_2\|_{p,Q}$.</p>
+<p><strong>Definition 2.1 (uniform entropy)</strong>
+For any $\delta &lt; 0$, consider a collection of $g_1, \dots, g_N$ such that for any $g \in \mathcal{G}$, there exists $j = j(g) \in \{1, \dots, N\}$, such that
+$$
+\|g - g_j\|_{p,Q} \le \delta.
+$$
+Let $N_p(\delta,\mathcal{G},Q)$ be the smallest value of $N$, which is called <strong>$\delta$-covering number</strong>
+Then,
+$$
+H_p(\delta,\mathcal{G},Q) \triangleq \log N_p(\delta,\mathcal{G},Q)
+$$
+is <strong>$\delta$-(uniform) entropy</strong> for the $L_p(Q)$-metric.</p>
+<p>Intuitively, $N_p(\delta,\mathcal{G},Q)$ is how many balls are needed to cover the entire $\mathcal{G}$.</p>
+<figure><img src="/img/201803/covering_number.png" width="400px"/>
+</figure>
+
+<h3 id="bracketing-entropy">Bracketing Entropy</h3>
+<p>It is sometimes convenient to prepare a slightly different definition for the entropy, depending on property of function classes.</p>
+<p><strong>Definition 2.2 (bracketing entropy)</strong>
+Let $N_{p,B}(\delta,\mathcal{G},Q)$ be the smallest value for $N$ for which there exist pairs of functions $\{(g_j^\mathrm{L}, g_j^\mathrm{U})\}_{j=1}^N$
+such that $\|g_j^\mathrm{U} - g_j^\mathrm{L}\|_{p,Q} \le \delta$ for $j \in \{1,\dots,N\}$
+and for each $g \in \mathcal{G}$, there exists $j = j(g) \in \{1,\dots,N\}$ such that
+$$
+g_j^\mathrm{L} \le g \le g_j^\mathrm{U}.
+$$
+$H_{p,B}(\delta,\mathcal{G},Q) \triangleq \log N_{p,B}(\delta,\mathcal{G},Q)$ is <strong>bracketing entropy</strong>.</p>
+<h3 id="entropy-for-the-supremum-norm">Entropy for the Supremum Norm</h3>
+<p>The supremum norm $|\cdot|_\infty$ is defined as
+$$
+|g|_\infty = \sup_{x \in \mathcal{X}} |g(x)|.
+$$
+Note that this does not depend on any measure, and is different from the limit of Definition 2.1 for $p \rightarrow \infty$:
+$$
+\lim_{p \rightarrow \infty} \|g\|_{p,Q} = \lim_{p \rightarrow \infty} \left(\int |g|^pdQ\right)^{1/p},
+$$
+which is the <em>essential supremum norm</em>.</p>
+<p><strong>Definition 2.3 (entropy for the supremum norm)</strong>
+Let $N_\infty(\delta,\mathcal{G})$ be the smallest value of $N$
+such that there exists $\{g_j\}_{j=1}^N$ with
+$$
+\sup_{g \in \mathcal{G}} \min_{j=1,\dots,N} |g - g_j|_\infty.
+$$
+$H_\infty(\delta,\mathcal{G}) \triangleq \log N_\infty(\delta,\mathcal{G})$ is <strong>entropy for the supremum norm</strong>.</p>
+<p>Basically, the entropy for the supremum norm does not depend on the probabilistic measure.</p>
+<h2 id="examples">Examples</h2>
+<p>Finally, we look through some simple examples to calculate the entropy.
+In general, the calculation is very complicated.
+Some more complicated examples can be seen in Birman and Solomyak (1967)<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<h3 id="example-1-increasing-functions-with-finite-domain">Example 1: Increasing Functions with Finite Domain</h3>
+<p><strong>Lemma 2.2</strong>
+Let $\mathcal{G}$ be a class of increasing functions $g: \mathcal{X} \rightarrow [0, 1]$
+and $\mathcal{X} \subset \mathbb{R}$ be a finite set with cardinality $n$.
+Then,
+$$
+H_\infty(\delta,\mathcal{G}) \le \frac{1}{\delta} \log\left(n + \frac{1}{\delta}\right), \qquad \text{for all $\delta &gt; 0$.}
+$$</p>
+<p><em>Proof</em>
+Let $\mathcal{X}$ consist of $n$ points $x_1 \le \dots x_n$.
+For each $g \in \mathcal{G}$, define
+$$
+M_i \triangleq \left\lfloor \frac{g(x_i)}{\delta} \right\rfloor \qquad \text{for $i = 1, \dots, n$,}
+$$
+where $\lfloor\cdot\rfloor$ is a floor symbol (the largest integer smaller than the argument).
+Take
+$$
+\widetilde{g}(x_i) = \delta M_i, \qquad \text{for $i = 1, \dots, n$.}
+$$
+Then, it is clear that $|\widetilde{g}(x_i) - g(x_i)| \le \delta$, for $i = 1, \dots, n$.</p>
+<p>We have $0 \le M_1 \le \dots \le M_n \le \lfloor 1/ \delta \rfloor$ and $M_i \in \mathbb{N}$.
+Therefore, the number of functions $\widetilde{g}$ can be counted combinatorially:
+$$
+\left(\mkern-6mu\left(\begin{array}{c}
+n + 1 \\\\
+\lfloor 1 / \delta \rfloor
+\end{array}\right)\mkern-6mu\right) =
+\left(\begin{array}{c}
+n + \lfloor 1 / \delta \rfloor \\\\
+\lfloor 1 / \delta \rfloor
+\end{array}\right),
+$$
+where the left hand side means the number of combinations with repetition<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.
+Using the upper bound for binomial coefficients<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>,
+$$
+\left(\begin{array}{c}
+n + \lfloor 1 / \delta \rfloor \\\\
+\lfloor 1 / \delta \rfloor
+\end{array}\right) \le
+\frac{(n + \lfloor 1 / \delta \rfloor)^{\lfloor 1 / \delta \rfloor}}{\lfloor 1 / \delta \rfloor !}
+\le \left(n + \frac{1}{\delta}\right)^{1 / \delta}.
+$$
+Thus we obtain the result.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Empirical Process in M-Estimation (van de Geer, 2000)&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p><a href="http://iopscience.iop.org/article/10.1070/SM1967v002n03ABEH002343/meta">Piecewise-Polynomial Approximations of Functions of the Classes $W_p^\alpha$</a>&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p><a href="https://en.wikipedia.org/wiki/Combination#Number_of_combinations_with_repetition">Number of combination with repetition - Wikipedia</a>&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p><a href="https://en.wikipedia.org/wiki/Binomial_coefficient#Bounds_and_asymptotic_formulas">Bounds and asymptotic formulas - Wikipedia</a>&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+        
+      </div>
+      <div class="paginator">
+        
+        <a class="link" href="https://hermite.jp/post/erm-optimal-convergence-rate/">← prev</a>
+        
+        
+        <a class="link" href="https://hermite.jp/post/empirical-process-chapter-3/">next →</a>
+        
+      </div>
+      <div class="comment">
+        
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© Han Bao / Last updated: 2021-04-11</span>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+<link media="screen" rel="stylesheet" href="https://hermite.jp/css/main.css" />
+
+
+
+
+
+</body>
+
+</html>

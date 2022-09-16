@@ -1,0 +1,68 @@
+div#profile {
+    width: 75%;
+}
+
+img#profile-image {
+    border-radius: 50%;
+    float: right;
+}
+
+hr {
+    border: 1px #ddd dashed;
+    margin: 20px 0 20px 0;
+}
+
+li.nostyle {
+    list-style: none;
+    padding-left: 1.2rem;
+    background-size: 0.7rem;
+    background-repeat: no-repeat;
+    background-position: 0 0.46rem;
+}
+
+li.icon-briefcase { background-image: url(/svg/briefcase.svg) }
+li.icon-badge { background-image: url(/svg/badge.svg) }
+li.icon-chat { background-image: url(/svg/double-quote-serif-right.svg) }
+li.icon-code { background-image: url(/svg/terminal.svg) }
+li.icon-file { background-image: url(/svg/file.svg) }
+li.icon-location { background-image: url(/svg/location.svg) }
+li.icon-mail { background-image: url(/svg/envelope-closed.svg) }
+li.icon-misc { background-image: url(/svg/grid-three-up.svg) }
+li.icon-music { background-image: url(/svg/musical-note.svg) }
+li.icon-people { background-image: url(/svg/people.svg) }
+li.icon-person { background-image: url(/svg/person.svg) }
+li.icon-study { background-image: url(/svg/pencil.svg) }
+
+span.stress-author {
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+span.stress-note {
+    font-weight: 600;
+    color: #CC0000;
+}
+
+.footnotes {
+  font-size: small;
+}
+
+figure {
+  text-align: center;
+}
+
+figcaption > h4 {
+  text-align: center;
+  font-weight: 100;
+  padding-bottom: 10px;
+}
+
+details > summary {
+  cursor: pointer;
+  margin-bottom: 10px;
+  text-decoration: underline;
+}
+
+details > summary:hover {
+  color: #666;
+}

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="Han Bao">
+
+
+
+<meta name="description" content="In Chapter 3, one of the most important theorem in empirical process theory, namely, the Uniform Law of Large Numbers (ULLN), is stated and discussed.
+Summary If a function class $\mathcal{G}$ is said to satisfy the ULLN, then $$ \sup_{g \in \mathcal{G}} \left| \int gd(P_n - P) \right| \rightarrow 0, \quad \text{a.s.} $$ The ULLN means that the expected and empirical average become closer as the number of samples gets larger for any $g \in \mathcal{G}$, which is explained in the following figure.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" computer science  machine learning  statistics ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+
+<link rel="canonical" href="https://hermite.jp/post/empirical-process-chapter-3/">
+
+
+
+
+<title>Empirical Process in M-Estimation (Chapter 3) - Han Bao</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/highlight.css'>
+
+  <link rel="stylesheet" href='https://hermite.jp/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://hermite.jp/">Han Bao</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/publication/">Publication</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/talk/">Talk</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/misc/">Misc</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/post/">Post</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      
+      <h1>Empirical Process in M-Estimation (Chapter 3)</h1>
+      
+      <time>2018-03-21</time>
+      <hr />
+      <div class="content">
+        
+        <p>In Chapter 3, one of the most important theorem in empirical process theory, namely, the Uniform Law of Large Numbers (ULLN), is stated and discussed.</p>
+<h2 id="summary">Summary</h2>
+<p>If a function class $\mathcal{G}$ is said to satisfy the ULLN, then
+$$
+\sup_{g \in \mathcal{G}} \left| \int gd(P_n - P) \right| \rightarrow 0, \quad \text{a.s.}
+$$
+The ULLN means that the expected and empirical average become closer as the number of samples gets larger for any $g \in \mathcal{G}$,
+which is explained in the following figure.
+<figure><img src="/img/201803/ulln.png" width="400px"/>
+</figure>
+</p>
+<p>Compared with the (strong) law of large numbers:
+$$
+X_n - \mu \rightarrow 0, \quad \text{a.s.}
+$$
+($X_1, \dots, X_n$ are integrable random variables whose mean is $\mu$),
+the ULLN imputes $\sup_{g \in \mathcal{G}}|\cdot|$,
+which means for all random variables the law of large number holds, intuitively.
+This theorem guarantees that we can rely on empirical average with a relatively large number of samples, as long as a somehow &ldquo;good&rdquo; function class $\mathcal{G}$ is used.</p>
+<p>We are interested in sufficient conditions on the random entropy $H_1(\delta,\mathcal{G},P_n)$ (here &ldquo;random&rdquo; means the distribution is $P_n$ rather $P$) in order to have the ULLN,
+and actually the condition is
+$$
+\frac{1}{n}H_1(\delta,\mathcal{G},P_n) \overset{p}{\rightarrow} 0, \quad \text{for $\forall \delta &gt; 0$,}
+$$
+with the &ldquo;envelope condition,&rdquo; which explained in the last part of this article.
+This entropy condition can also be interpreted as that <em>entropy does not grow faster than linearly</em>.</p>
+<p>Techniques used in the proof is <strong>chaining</strong> and <strong>symmetrization</strong>, which often appears in empirical process theory.</p>
+<figure><img src="/img/201803/vdg-chapter3.png" width="500px"/>
+</figure>
+
+<p>In later parts, we are focusing on the proof of sufficient conditions for the ULLN.
+The main theorem is stated in the last part of this article, the section simply named <a href="#ULLN">&ldquo;Uniform Law of Large Numbers.&rdquo;</a>
+If you are not interested in the proof details, you can skip to there.</p>
+<h2 id="technique-1-chaining-and-entropy-integral">Technique 1: Chaining and Entropy Integral</h2>
+<p>Let us begin with chaining technique, which is widely used in empirical process theory.
+If a given class $\mathcal{G}$ is finite, it is somewhat straightforward to obtain the uniform result.
+When a infinite class is given, i.e., the number of functions contained in $\mathcal{G}$ is over finite,
+we still get the same result by chaining technique, making finer and finer approximations of the class.</p>
+<p>From now on, I formally state the chaining technique.
+Suppose that $\mathcal{G} \subset L_2(Q)$, and $\sup_{g \in \mathcal{G}}\|g\|_Q \le R$.
+For notational convenience, we index the functions in $\mathcal{G}$ by a parameter $\theta \in \Theta$
+as $\mathcal{G} = \{g_\theta \mid \theta \in \Theta\}$.
+For $s = 0, 1, 2, \dots$, let $\{g_j^s\}_{j=1}^{N_s}$ be a minimal $2^{-s}R$-covering set of $(\mathcal{G},\|\cdot\|_Q)$.
+In other words, $N_s = N(2^{-s}R,\mathcal{G},Q)$, and for each $\theta$, there exists a $g_\theta^s \in \{g_1^s, \dots, g_{N_s}^s\}$ such that $\|g_\theta - g_\theta^s\|_Q \le 2^{-s}R$ (the definition of the covering set),
+where $g_\theta$ is regarded as approximated by $g_\theta^s$.
+For convenience, let $g_\theta^0 \triangleq 0$, since $\|g_\theta\|_Q \le R$.
+Then, for any $S$,
+$$
+g_\theta = \sum_{s=1}^S (g_\theta^s - g_\theta^{s-1}) + (g_\theta - g_\theta^S).
+$$</p>
+<p>As $S$ becomes sufficiently large, the second term in the RHS $(g_\theta - g_\theta^S)$ is small enough.
+The terms appearing in the first sum $(g_\theta^s - g_\theta^{s-1})$ can be made smaller as we choose appropriate $\theta$,
+and finally only involves finitely many functions (namely, $S$ functions).</p>
+<figure><img src="/img/201803/chaining.png" width="500px"/>
+</figure>
+
+<p>Intuition of chaining is shown in the above figure.
+The covers for a given function class (yellow planes shown in the figure) become more and more finer as $s$ grows.</p>
+<p>As stated in <a href="https://hermite.jp/post/empirical-process-chapter-2/">Chapter 2</a>, entropy controls complexity of a given function,
+thus we want entropy, or covering number, not to be too large.
+In chaining technique, there are $2^{-s}$-covering sets for $s = 1, \dots, S$.
+Here what we need to suppress is the weighted sum
+$$
+\sum_{s=1}^S 2^{-s} R H^{1 / 2}(2^{-s}R, \mathcal{G}, Q_n),
+$$
+which can be understood as somewhat &ldquo;volume&rdquo; of entire covers, informally.
+The sum in this quantity can be replaced with an integral, under the condition of well-definedness:
+$$
+\sum_{s=1}^S 2^{-s}RH^{1 / 2}(2^{-s}R, \mathcal{G}, Q_n) \le 2\int_{\rho / 4}^R H^{1 / 2}(u, \mathcal{G}, Q_n)du,
+$$
+for $R &gt; \rho$ and $S \triangleq \min\{s \ge 1 \mid 2^{-s}R \le \rho\}$.
+The RHS is called <strong>(Dudley&rsquo;s) entropy integral</strong>.</p>
+<p>This bound is said to be easy to check in van de Geer (2000)<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> (P.29), but I don&rsquo;t think so&hellip;
+A nice lecture note provided by Peter Bartlett<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> (P.9) might be helpful to understand this one (but I haven&rsquo;t gone through yet!!).</p>
+<h2 id="maximal-inequalities-for-weighted-sums">Maximal Inequalities for Weighted Sums</h2>
+<p>Next, we obtain an additional tool needed for the proof of the ULLN condition, maximal inequalities for weighted sums.
+Let $\xi_1, \dots, \xi_n \in \mathcal{X}$ be non-i.i.d. r.v.&rsquo;s,
+and $Q_n$ be a empirical measure over them, i.e.,
+$$
+Q_n \triangleq \frac{1}{n} \sum_{i=1}^n \delta_{\xi_i}.
+$$
+Let $W \in \mathbb{R}^n$ be a random vector.</p>
+<p><strong>Maximal Inequality</strong>
+If $Z_j$ (for $j=1,\dots,N$) satisfies $P(Z_j \ge a) \le \exp(-a^2)$, then
+$$
+P\left(\max_{j=1,\dots,N}Z_j \ge a\right) \le \exp(\log N - a^2).
+$$</p>
+<p>This is one of a basic concentration inequality (refer Lugosi et al. (2013)<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>).
+Now we extend this inequality for weighted sums.
+The extended one is not only applicable to the proof of the ULLN condition, but also to the variety of proofs appearing in later chapters.</p>
+<p><strong>Lemma 3.2 (Maximal Inequality for Weighted Sums)</strong>
+Suppose that for some constants $C_1$ and $C_2$, we have that for each $\gamma \in \mathbb{R}^n$ and all $a &gt; 0$,
+$$
+P\left(\left|\sum_{i=1}^nW_i\gamma_i\right| \ge a\right) \le C_1\exp\left(- \frac{a^2}{C_2^2 \sum_{i=1}^n \gamma_i^2} \right).
+$$
+Assume $\sup_{g\in\mathcal{G}}\|g\|_{Q_n} \le R$.
+There exists a constant $C$ depending only on $C_1$ and $C_2$ such that for all $0 \le \epsilon &lt; \delta$, and $K &gt; 0$ satisfying
+$$
+\sqrt{n}(\delta-\epsilon) \ge C\left(\max\left\{\int_{\epsilon / 4K}^R H^{1 / 2}(u,\mathcal{G},Q_n)du, R\right\}\right),
+$$
+we have
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(\xi_i)\right| \ge \delta \text{ and } \frac{1}{n}\sum_{i=1}^nW_i^2 \le K^2\right) \le C\exp\left(-\frac{n(\delta-\epsilon)^2}{C^2R^2}\right).
+$$</p>
+<p>The statement of Lemma 3.2 is a little bit lengthy,
+but the key point is that the probability of $\sup_gn^{-1}|\sum_i W_ig(\xi_i)| &gt; \delta$ is bounded exponentially, under certain conditions.
+Let&rsquo;s look through the proof of Lemma 3.2, noticing that the chaining technique plays an important role.
+Actually, the original proof in van de Geer (2000) omits a lots of details. I complements as much as I can.</p>
+<p><strong>Proof of Lemma 3.2</strong>
+We take $C$ in a <em>constructive way</em>: take $C$ sufficiently large such that
+$$
+\sqrt{n}(\delta-\epsilon) \ge \max\left\{ 12C_2\sum_{s=1}^S2^{-s}RH^{1 / 2}(2^{-s}R,\mathcal{G},Q_n), \sqrt{1152\log 2} C_2R \right\}.
+$$
+Taking the maximum in order to &ldquo;impute both conditions,&rdquo; that is, $a &gt; \max\{b,c\}$ implies both $a &gt; b$ and $a &gt; c$.
+Both conditions are used later, independently.</p>
+<p>For $s = 0, 1, \dots$, let $\{g_j^s\}_{j=1}^{N_s}$ be a minimal $2^{-s}R$-covering set of $\mathcal{G}$.
+For $S \triangleq \min\{s \ge 1 \mid 2^{-s}R \le \frac{\epsilon}{K}\}$,
+applying Cauthy-Schwartz inequality on $\{\frac{1}{n}\sum_{i=1}^nW_i^2 \le K^2\}$,
+$$
+\left|\frac{1}{n}\sum_{i=1}^nW_i(g_\theta(\xi_i) - g_\theta^S(\xi_i))\right| \le K\|g_\theta - g_\theta^S\|_{Q_n} \le \epsilon,
+$$
+where the last inequality holds from the definition of $S$,
+that is, we can obtain the last inequality as the cover becomes finer enough.</p>
+<p>Then, the goal is to prove the exponential inequality for
+$$
+P\left(\max_{j=1,\dots,N_S}\left|\frac{1}{n}\sum_{i=1}^nW_ig_j^S(\xi_i)\right| \ge \delta - \epsilon\right).
+$$
+Using the above inequality obtained by Cauthy-Schwartz, and the triangular inequality, this probability reduces back to the original target probability.
+Here chaining is used: $g_\theta^S = \sum_{s=1}^S(g_\theta^s - g_\theta^{s-1})$.
+By the triangular inequality,
+$$
+\|g_\theta^s - g_\theta^{s-1}\|_{Q_n}
+\le \|g_\theta^s - g_\theta\|_{Q_n} + \|g_\theta - g_\theta^{s-1}\|_{Q_n}
+\le 2^{-s}R + 2^{-s+1}R = 3(2^{-s}R).
+$$
+Let $\eta_s \in \mathbb{R}_{&gt;0}$ satisfying $\sum_{s=1}^S\eta_s \le 1$.
+Then (the following probability is the same with the goal because of the chaining)
+$$
+\begin{aligned}
+P&amp;\left(\sup_{\theta \in \Theta}\left|\frac{1}{n}\sum_{s=1}^S\sum_{i=1}^nW_i(g_\theta^s(\xi_i) - g_\theta^{s-1}(\xi_i))\right| \ge \delta - \epsilon\right)
+\\\\
+&amp;\le \sum_{s=1}^SP\left(\sup_{\theta \in \Theta}\left|\frac{1}{n}\sum_{i=1}^nW_i(g_\theta^s(\xi_i) - g_\theta^{s-1}(\xi_i))\right| \ge (\delta - \epsilon)\eta_s\right)
+\\\\
+&amp;\le \sum_{s=1}^S C_1\exp\left(2H(2^{-s}R,\mathcal{G},Q_n) - \frac{n(\delta-\epsilon)^2\eta_s^2}{9C_2^22^{-2s}R^2}\right),
+\end{aligned}
+$$
+where the first inequality follows from the union bound,
+and the second from the combination of the maximal inequality and a result of the chaining
+$$
+\sum_{i=1}^n|g_\theta^s(\xi_i) - g_\theta^{s-1}(\xi_i)|^2 \le n(3(2^{-s}R))^2 \le 9n\cdot 2^{-2s}R^2.
+$$
+Say, from the first assumption of Lemma 3.2, we have
+$$
+P\left(\left(\frac{\log C_1}{C_2^2\sum_{i=1}^n\gamma_i^2}\right)^{-\frac{1}{2}}\left|\sum_{i=1}^nW_i\gamma_i\right| \ge a\right) \le \exp(-a^2),
+$$
+based on which we can state the maximal inequality
+$$
+\begin{aligned}
+P&amp;\left(\sup_{\theta\in\Theta}\left|\frac{1}{n}\sum_{i=1}^nW_i(g_\theta^s(\xi_i) - g_\theta^{s-1}(\xi_i))\right| \ge (\delta-\epsilon)\eta_s\right) \\\\
+&amp;\le C_1\exp\left(2\log N_s -\frac{n^2(\delta-\epsilon)^2\eta_s^2}{C_2^2\sum_{i=1}^n|g_\theta^s(\xi_i) - g_\theta^{s-1}(\xi_i)|^2}\right).
+\end{aligned}
+$$
+Note that the cardinality of $\Theta$ is $N_s$ by the chaining, and that $\log N_s = \log N(2^{-s}R,\mathcal{G},Q_n) = H(2^{-s}R,\mathcal{G},Q_n)$.
+<a name="Q1"></a>
+<strong>I don&rsquo;t know why there is a coefficient 2 in front of entropy.</strong></p>
+<p>Last task before concluding the proof is to choose an appropriate $\eta_s$.
+Let&rsquo;s choose as
+$$
+\eta_s = \max\left\{ \frac{6C_2s^{-s}RH^{1 / 2}(2^{-s}R,\mathcal{G},Q_n)}{\sqrt{n}(\delta - \epsilon)}, \frac{2^{-s}\sqrt{s}}{8} \right\}.
+$$
+Then, by the choice of $C$,
+$$
+\begin{aligned}
+\sum_{s=1}^S\eta_s
+&amp;\le \sum_{s=1}^S\frac{6C_22^{-s}RH^{1 / 2}(2^{-s}R,\mathcal{G},Q_n)}{\sqrt{n}(\delta - \epsilon)} + \sum_{s=1}^S\frac{2^{-s}\sqrt{s}}{8} \\\\
+&amp;\le \frac{1}{2} + \frac{1}{2} \\\\
+&amp;= 1,
+\end{aligned}
+$$
+where the first inequality is from the union bound,
+and the second inequality is from $\sum_{s=1}^S2^{-s}\sqrt{s} \le 4$, which is shown in van de Geer and I omit here.
+From the definition of $\eta_s$,
+$$
+\eta_s \ge \frac{6C_s2^{-s}RH^{1 / 2}(2^{-s}R,\mathcal{G},Q_n)}{\sqrt{n}(\delta-\epsilon)}
+$$
+so that
+$$
+H(2^{-s}R,\mathcal{G},Q_n) \le \frac{n(\delta-\epsilon)^2\eta_s^2}{36C_2^22^{-2s}R^2}.
+$$
+Thus
+$$
+\begin{aligned}
+\sum_{s=1}^S&amp;C_1\exp\left(2H(2^{-s}R,\mathcal{G},Q_n)-\frac{n(\delta-\epsilon)^2\eta_s^2}{9C_2^22^{-2s}R^2}\right)
+\\\\
+&amp;\le \sum_{s=1}^SC_1\exp\left(-\frac{n(\delta-\epsilon)^2\eta_s^2}{18C_2^22^{-2s}R^2}\right)
+\\\\
+&amp;\le \sum_{s=1}^\infty C_1\exp\left(-\frac{n(\delta-\epsilon)^2s}{1152C_2^2R^2}\right)
+\\\\
+&amp;= C_1\left(1-\exp\left(-\frac{n(\delta-\epsilon)^2}{1152C_2^2R^2}\right)\right)^{-1}\exp\left(-\frac{n(\delta-\epsilon)^2}{1152C_2^2R^2}\right)
+\\\\
+&amp;\le 2C_1\exp\left(-\frac{n(\delta-\epsilon)^2}{1152C_2^2R^2}\right),
+\end{aligned}
+$$
+where the first inequality is from just the above entropy bound,
+the second inequality comes from $\eta_s \ge 2^{-s}\sqrt{s} / 8$,
+the third equality is the sum of geometric series
+and the last inequality comes from the definition of $C$:
+$$
+\frac{n(\delta-\epsilon)^2}{1152C_2^2R^2} \ge \log 2.
+$$
+So far, Lemma 3.2 is proved.</p>
+<p>Concluding remarks: Importantlly, since $\log N$ appears in the upper bound of maximal inequality, entropy is more common tool than covering number, I guess.
+That is, the logarithm of covering number governs the behavior of empirical processes.
+Actually, the combination of</p>
+<ul>
+<li>maximal inequality</li>
+<li>entropy</li>
+<li>chaining</li>
+</ul>
+<p>are highly useful, as it can be seen from this proof.</p>
+<h2 id="technique-2-symmetrization">Technique 2: Symmetrization</h2>
+<p><em>Symmetrized</em> empirical process often becomes easier to handle, because the maximal inequalities for weighted sums can be used.
+More details about symmetrization are described in Talagrand &amp; Ledoux (1991)<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup> (Chapter 6).</p>
+<p>Let both $X_1, \dots, X_n$ and $X_1&rsquo;, \dots, X_n&rsquo;$ be i.i.d. r.v.&rsquo;s follows a distribution $P$.
+$P_n$ and $P_n&rsquo;$ be empirical distributions based on each pair of r.v.&rsquo;s, respectively.</p>
+<p><strong>Lemma 3.3 (Symmetrization)</strong>
+Suppose that for all $g \in \mathcal{G}$,
+$$
+P\left(\left|\int gd(P_n-P)\right| &gt; \frac{\delta}{2}\right) \le \frac{1}{2}.
+$$
+Then,
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P)\right| &gt; \delta\right) \le 2P\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P_n&rsquo;)\right| &gt; \frac{\delta}{2}\right).
+$$</p>
+<p>Since the proof of Lemma 3.3 is not hard to follow, I omit here.</p>
+<p><strong>Corollary 3.4</strong>
+Suppose $\sup_{g\in\mathcal{G}}\|g\| \le R$.
+Then for $n \ge 8R^2 / \delta^2$,
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P)\right| &gt; \delta\right)
+\le 4P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(X_i)\right| &gt; \frac{\delta}{4}\right),
+$$
+where $W_1,\dots,W_n$ are Rademacher variables independent of $X_1,\dots,X_n$.</p>
+<p><strong>Proof of Corollary 3.4</strong>
+$$
+\begin{aligned}
+P&amp;\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P)\right| &gt; \delta\right)
+\\\\
+&amp;\le 2P\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P_n&rsquo;)\right| &gt; \frac{\delta}{2}\right)
+\\\\
+&amp;= 2P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_i(g(X_i)-g(X_i&rsquo;))\right| &gt; \frac{\delta}{2}\right)
+\\\\
+&amp;\le 4P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(X_i)\right| &gt; \frac{\delta}{4}\right),
+\end{aligned}
+$$
+where the first inequality is from Lemma 3.3,
+the second equality comes from the property of Rademacher variables.
+<a name="Q2"></a>
+<strong>I don&rsquo;t know why the last inequality holds</strong>.</p>
+<p>Anyway, thus the tail probability of empirical processes is bounded by the tail probability of Rademacher averages,
+which can also be bounded by the maximal inequalities for weighted sums.</p>
+<h2 id="uniform-law-of-large-numbers">Uniform Law of Large Numbers</h2>
+<p><a name="ULLN"></a></p>
+<p>First, a stronger condition for the ULLN is shown.</p>
+<p><strong>Lemma 3.6</strong>
+Suppose $\sup_{g\in\mathcal{G}}|g|_\infty \le R$, and
+$$
+\frac{1}{n}H(\delta,\mathcal{G},P_n) \overset{p}{\rightarrow} 0, \quad \text{for $\forall \delta &gt; 0$,}
+$$
+then $\mathcal{G}$ satisfies the ULLN.</p>
+<p><strong>Proof of Lemma 3.6</strong>
+Let $\delta &gt; 0$ be arbitrary.
+By Corollary 3.4,
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P)\right| &gt; \delta\right)
+\le 4P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(X_i)\right| &gt; \frac{\delta}{4}\right).
+$$
+By Hoeffding&rsquo;s inequality, for each $\gamma \in \mathbb{R}^n$ and $a &gt; 0$,
+$$
+P\left(\left|\sum_{i=1}^nW_i\gamma_i\right| \ge a\right) \le 2\exp\left(-\frac{a^2}{2\sum_{i=1}^n\gamma_i^2}\right),
+$$
+which holds because of $W_i\gamma_i \in [-\gamma_i,+\gamma_i]$, in precise way.
+I will not go in detail about Hoeffding&rsquo;s inequality. Please refer to, e.g., Lugosi et al. (2013), or Section 3.5 of van de Geer.</p>
+<p>Here, Lemma 3.2 holds for $K=1$, replacing $\delta$ by $\frac{\delta}{4}$ and $\epsilon=\frac{\delta}{8}$.
+Each assumption in Lemma 3.2 can be confirmed:</p>
+<ol>
+<li>
+<p>By Hoeffding&rsquo;s inequality,
+$$
+P\left(\left|\sum_{i=1}^nW_i\gamma_i\right| \ge a\right) \le C_1\exp\left(-\frac{a^2}{C_2^2\sum_{i=1}^n\gamma_i^2}\right).
+$$</p>
+</li>
+<li>
+<p>By the assumption of this lemma, $\sup_{g\in\mathcal{G}}\|g\|_{Q_n} \le R$.</p>
+</li>
+<li>
+<p>By <a href="#conditioning">the conditioning below</a>,
+$$
+\frac{\delta}{8}\sqrt{n} \ge C\max\left\{\int_{\delta / 32}^RH^{1 / 2}(u,\mathcal{G},Q_n)du, R\right\}.
+$$</p>
+</li>
+</ol>
+<p>Thus,
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(\xi_i)\right| \ge \frac{\delta}{4}\right) \le C\exp\left(-\frac{n\delta^2}{64C^2R^2}\right).
+$$</p>
+<p>Clearly,
+$$
+\int_{\delta / 32}^RH^{1 / 2}(x,\mathcal{G},P_n)dx \le RH^{1 / 2}\left(\frac{\delta}{32},\mathcal{G},P_n\right).
+$$
+I guess you can tell why the above inequality holds from the below figure.
+<figure><img src="/img/201803/entropy_bound.png" width="400px"/>
+</figure>
+
+Note that entropy is decreasing w.r.t. the ball radius because more covers are needed with finer balls (i.e., small radius).</p>
+<p>Apply Lemma 3.2 conditionally on $X_1, \dots, X_n$, on the set
+$$
+A_n = \left\{ \sqrt{n}\frac{\delta}{8} \ge C\max\left\{RH^{1 / 2}\left(\frac{\delta}{32},\mathcal{G},P_n\right), R\right\} \right\},
+$$
+then we find
+$$
+P\left(\sup_{g\in\mathcal{G}}\left|\frac{1}{n}\sum_{i=1}^nW_ig(X_i)\right| \ge \frac{\delta}{4}\right)
+\le C\exp\left(-\frac{n\delta^2}{64C^2R^2}\right) + P(\overline{A_n})
+\rightarrow 0, \quad \text{a.s.}
+$$
+I will add some complementary explanation.
+<a name="conditioning"></a>
+Let $E$ be the event appearing in the probability of the LHS.
+Then,
+$$
+\begin{aligned}
+P(E)
+&amp;= P(E \mid X \in A_n)P(X \in A_n) + P(E \mid X \not\in A_n)P(X \not\in A_n)
+\\\\
+&amp;\le C\exp\left(-\frac{n\delta^2}{64C^2R^2}\right) \cdot 1 + 1 \cdot P(\overline{A_n}).
+\end{aligned}
+$$
+Thus the proof of Lemma 3.6 is concluded.</p>
+<p>Now, let&rsquo;s extend the result for a class of functions with <strong>envelope condition</strong>:
+$$
+G \triangleq \sup_{g\in\mathcal{G}}|g| \in L_1(P).
+$$
+<figure><img src="/img/201803/envelope.png" width="400px"/>
+</figure>
+</p>
+<p><strong>Theorem 3.7</strong>
+Assume the envelope condition $\int GdP &lt; \infty$ and suppose that
+$$
+\frac{1}{n}H_1(\delta,\mathcal{G},P_n) \overset{p}{\rightarrow} 0, \quad \text{for $\forall \delta &gt; 0$.}
+$$
+Then $\mathcal{G}$ satisfies the ULLN.</p>
+<p><strong>Proof of Theorem 3.7</strong>
+For each $R &gt; 0$, let
+$$
+\mathcal{G}_R \triangleq \{g1\{G \le R\} \mid g \in \mathcal{G}\}.
+$$
+For each $g_1, g_2 \in \mathcal{G}$,
+$$
+\begin{aligned}
+\int_{G \le R}(g_1 - g_2)^2dP_n
+&amp;\le \int |+R - (-R)| \cdot |g_1 - g_2|dP_n
+\\\\
+&amp;= 2R\int |g_1 - g_2|dP_n,
+\end{aligned}
+$$
+so
+$$
+\begin{aligned}
+&amp;\frac{1}{n}H_1(\delta,\mathcal{G},P_n) \overset{p}{\rightarrow} 0 \quad \text{for $\forall \delta &gt; 0$}
+\\\\
+\Rightarrow &amp; \frac{1}{n}H(\delta,\mathcal{G}_R,P_n) \overset{p}{\rightarrow} 0 \quad \text{for $\forall \delta, R &gt; 0$.}
+\end{aligned}
+$$
+Therefore, by Lemma 3.6, the ULLN holds for each $\mathcal{G}_R$.
+Now take $\delta &gt; 0$ arbitrary.
+Take $R$ sufficiently large (because $R$ is an arbitrary constant) such that
+$$
+\int_{G &gt; R} GdP \le \delta.
+$$
+Next, take $n$ sufficiently large (based on $\varepsilon\text{-}N$ definition of limit) such that
+$$
+\int_{G &gt; R} GdP_n \le 2\delta \quad \text{a.s.}
+$$
+(dirac masses not concentrated too much at the region $G &gt; R$) and
+$$
+\sup_{g\in\mathcal{G}} \left|\int_{G \le R} gd(P_n-P)\right| \le \delta \quad \text{a.s.}
+$$
+(the ULLN holds for $\mathcal{G}_R$ thus we can take such sufficiently large $n$)</p>
+<p>Then,
+$$
+\begin{aligned}
+\sup_{g\in\mathcal{G}}\left|\int gd(P_n-P)\right|
+&amp; \le \sup_{g\in\mathcal{G}}\left|\int_{G\le R} gd(P_n-P)\right| + \int_{G&gt;R}GdP_n + \int_{G&gt;R}GdP
+\\\\
+&amp; \le 4\delta \quad \text{a.s.,}
+\end{aligned}
+$$
+where the first inequality is from the triangular inequality.
+This statement implies convergence in probability.
+Thus the proof of Theorem 3.7 is concluded.</p>
+<h2 id="my-questions">My Questions</h2>
+<ul>
+<li>Why is there 2 in front of the entropy in the exponential upper bound in the proof of Lemma 3.2? [<a href="#Q1">here</a>]</li>
+<li>The proof of Corollary 3.4 [<a href="#Q2">here</a>]</li>
+</ul>
+<p>Please let me know if you have an idea.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Empirical Process in M-Estimation (van de Geer, 2000)&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p><a href="https://www.stat.berkeley.edu/~bartlett/courses/2013spring-stat210b/notes/14notes.pdf">(210B) Theoretical Statistics. Lecture 14. (Bartlett, 2013)</a>&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p><a href="https://www.hse.ru/data/2016/11/24/1113029206/Concentration%20inequalities.pdf">Concentration Inequalities: A Nonasymptotic Theory of Independence (Lugosi, Massart &amp; Boucheron, 2013)</a>&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>Probability in Banach Spaces (Talagrand &amp; Ledoux, 1991)&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+        
+      </div>
+      <div class="paginator">
+        
+        <a class="link" href="https://hermite.jp/post/empirical-process-chapter-2/">← prev</a>
+        
+        
+        <a class="link" href="https://hermite.jp/post/2021/scrap-summary-1/">next →</a>
+        
+      </div>
+      <div class="comment">
+        
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© Han Bao / Last updated: 2021-04-11</span>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+<link media="screen" rel="stylesheet" href="https://hermite.jp/css/main.css" />
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+<meta name="author" content="Han Bao">
+
+
+
+<meta name="description" content="These days, papers such as du Plessis et al. (NIPS2014)1 and Sakai et al. (ICML2017)2 refers optimality of convergence rates of their learning methods. The convergence rate $O(n^{-\frac{1}{2}})$ is referred to as optimal (parametric) convergence rate for classification. In this article, I investigate why this is optimal for empirical risk minimization.
+Most of the parts in this article try to describe intuition of Mendelson&rsquo;s technical report3. I tried to explain as intuitive as possible, but sometimes sacrificed rigidness of discussion.">
+
+
+
+<link rel="icon" href="/favicon.ico">
+
+
+
+<meta name="keywords" content=" computer science  machine learning  statistics ">
+
+
+
+
+<script>
+  
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\[\[', '\]\]']],
+      processEscapes: true,
+      processEnvironments: true,
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    }
+  };
+</script>
+
+<script async defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+
+
+
+<link rel="canonical" href="https://hermite.jp/post/erm-optimal-convergence-rate/">
+
+
+
+
+<title>Optimal Convergence Rate for Empirical Risk Minimization - Han Bao</title>
+
+
+
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/common.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/content.css'>
+<link media="screen" rel="stylesheet" href='https://hermite.jp/css/highlight.css'>
+
+  <link rel="stylesheet" href='https://hermite.jp/css/single.css'>
+</head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1>
+    <a href="https://hermite.jp/">Han Bao</a>
+  </h1>
+
+  <nav>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/publication/">Publication</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/talk/">Talk</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/misc/">Misc</a>
+    </span>
+    
+    <span class="nav-bar-item">
+      <a class="link" href="/post/">Post</a>
+    </span>
+    
+  </nav>
+</header>
+
+    <main id="main" class="post">
+      
+      
+      
+      <h1>Optimal Convergence Rate for Empirical Risk Minimization</h1>
+      
+      <time>2018-02-23</time>
+      <hr />
+      <div class="content">
+        
+        <p>These days, papers such as du Plessis et al. (NIPS2014)<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> and Sakai et al. (ICML2017)<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup> refers optimality of convergence rates of their learning methods.
+The convergence rate $O(n^{-\frac{1}{2}})$ is referred to as <em>optimal (parametric) convergence rate</em> for classification.
+In this article, I investigate why this is optimal for empirical risk minimization.</p>
+<p>Most of the parts in this article try to describe intuition of Mendelson&rsquo;s technical report<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>.
+I tried to explain as intuitive as possible, but sometimes sacrificed rigidness of discussion.
+It would be better to utilize this article as an auxiliary material to read Mendelson&rsquo;s report.</p>
+<h2 id="prologue">Prologue</h2>
+<p>$$
+\newcommand{\argmax}{\mathrm{argmax}}
+\newcommand{\argmin}{\mathrm{argmin}}
+\renewcommand{\hat}{\widehat}
+$$</p>
+<p>In statistical machine learning, there are mainly the following two types of problems:</p>
+<ol>
+<li>estimation of a true target (function learning)</li>
+<li>selection of a criterion minimizer (agnostic learning)</li>
+</ol>
+<p>Examples for the first problem is density estimation and squared mutual information<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>.
+These problems have (unknown) true targets, and their goal is to estimate true targets by statistical methods.
+In statistical estimation, first we have a model $\mathcal{F}$ and loss $L$ written by the expectation.
+The expectation is usually replaced with samples and we obtain empirical version $\hat{L}$.
+Let</p>
+<ul>
+<li>$f^* = \argmin_{f \in \mathcal{F}} L(f)$</li>
+<li>$\hat{f} = \argmin_{f \in \mathcal{F}} \hat{L}(f)$</li>
+</ul>
+<p>then we estimate $f^*$ by $\hat{f}$.
+However, our model class $\mathcal{F}$ does not always include the true target $f^\dagger$ (when model is mis-specified).
+Thus we need to consider</p>
+<ul>
+<li>estimation error: error between $\hat{f}$ and $f^*$, originating from sample approximation and optimization</li>
+<li>approximation error: error between $f^*$ and $f^\dagger$, originating from model specification</li>
+</ul>
+<figure><img src="/img/201802/estimation-approximation-error.png" width="400px"/>
+</figure>
+
+<p>On the other hand, usually we only need to consider estimation error in the second problem.
+A common example is classification.
+Basically there does not exist a unique target, rather our goal is to select the best model.
+In classification, our goal is to obtain the model with minimum errors, which is not necessarily a classifier with zero errors<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>.
+The goal is often achieved by the empirical risk minimization.</p>
+<p>In both cases, it still remains the same what we need to do to obtain a model, i.e., minimizing estimation error,
+but there is a subtle difference in philosophy.
+Now let&rsquo;s move on to discussion of convergence rates (of the estimation error).</p>
+<h2 id="notations">Notations</h2>
+<p><a name="#notations"></a></p>
+<p>Afterwards, I mainly refer to the technical report written by Mendelson<sup id="fnref1:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> to discuss optimality of convergence rates.
+We consider <em>function learning problem</em>, where the learner is given a random sample $\{X_i\}_{i=1}^k \sim \mu$ and $\{T(X_i)\}_{i=1}^k$ ($T$: target function).
+Assume that $E$ is a reasonable normed space of random variables on $(\Omega,\mu)$,
+a loss function is connected to the norm of $E$ (e.g., $p$-loss<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup> for $L_p$ space),
+$F \subset E$ is a &ldquo;small&rdquo; model class where $T$ has more than one best approximation.
+Let $N(F,E)$ be the set of functions in $E$ that have more than one best approximation in $F$.
+Let $f_* \in F$ be a fixed best approximation of $T$ (chosen one arbitrarily),
+and $T_\lambda = (1 - \lambda)T + \lambda f_*$.</p>
+<p><figure><img src="/img/201802/mendelson-fig1.png" width="400px"/>
+</figure>
+
+(the figure is borrowed from Mendelson&rsquo;s report)</p>
+<p>Later, for $\lambda_k \sim 1/\sqrt{k}$, $T_{\lambda_k}$ appears to be a &ldquo;bad&rdquo; target function, i.e.,
+$$
+\mathbb{E}_X \mathbb{E}\left( \ell(\hat{f},T_{\lambda_k}) \mid X_1,\dots,X_k \right) - \inf_{f \in F} \mathbb{E} \ell(f,T_{\lambda_k}) \ge \frac{c}{\sqrt{k}},
+$$
+where $\hat{f}$ is the empirical risk minimizer and $c$ is a constant depending only on $F$, $\ell$ and $E$.</p>
+<p>Let $P_kg = \frac{1}{k} \sum_{i=1}^k g(X_i)$, $Pg = \mathbb{E}_Xg$<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>.
+Let $\mathcal{L}(f) = \ell(f,T) - \ell(f_*,T)$ and $\mathcal{L}_\lambda(f) = \ell(f,T_\lambda) - \ell(f_*,T_\lambda)$ be the excess loss functional w.r.t. $T$ and $T_\lambda$, respectively.</p>
+<h2 id="main-theorem">Main Theorem</h2>
+<p>The following theorem is main statement of Mendelson&rsquo;s technical report, which tells us what is the optimal convergence rate, or the lower bound for the empirical risk minimization.</p>
+<p><strong>Theorem 1.2</strong>
+Let $2 \le p \le \infty$ and $E = L_p(\mu)$.
+Assume that $F \subset E$ is a $\mu$-Donsker class of functions bounded by $1$, let $R &gt; 0$ and assume that $\mathcal{T} \subset E \cap B(0, R)$ is convex and contains $F$.
+If $\ell$ is the $p$-loss function and $\mathcal{T} \cap N(F,E) \ne \emptyset$, then for $k \ge k_0$,
+$$
+\sup_{T \in \mathcal{T}}\left( \mathbb{E}_X \mathbb{E}\left( \ell(\hat{f}, T) \mid X_1, \dots, X_k \right) - \inf_{f \in F} \mathbb{E}\ell(f,T) \right) \ge \frac{c}{\sqrt{k}} ,
+$$
+where $c$ and $k_0$ depend only on $p$, $F$ and $R$.</p>
+<p>This theorem states that the empirical risk minimizer $\hat{f}$ cannot do better than $O(1/\sqrt{k})$ against a certain target function.
+In other words, even if the empirical risk minimizer is obtained, its excess risk is more than $O(1/\sqrt{k})$ for a certain target function.
+Thus $O(1/\sqrt{k})$ is said to be optimal convergence rate for ERM.
+If we want to obtain faster rate, we need to make stronger assumptions jointly on density, loss function and model class, which is hardly satisfied in practice.</p>
+<h2 id="outline-of-proof">Outline of Proof</h2>
+<p><a name="outline"></a></p>
+<p>The following figure hopefully clarifies relationships between theorems/lemmas in Mendelson (2008).
+<figure><img src="/img/201802/mendelson-read-guide.png" width="600px"/>
+</figure>
+</p>
+<p>In Part1, it is shown that $f$ with small expected excess loss $P\mathcal{L}_{\alpha/\sqrt{k}}(f) \le \beta/\sqrt{k}$ gives small empirical excess loss: $|P_k\mathcal{L}_\lambda(f)| \le C/\sqrt{k}$ with high probability, say $\frac{5}{6}$ (Theorem 3.2).
+In Part2, &ldquo;bad&rdquo; target $T_\lambda$ is constructed when $\lambda \sim \alpha/\sqrt{k}$: $P_k\mathcal{L}_\lambda(f) \le -C/\sqrt{k}$ with some probability, say $\frac{1}{4}$ (Lemma 3.9),
+which is larger than $1 - \frac{5}{6} = \frac{1}{6}$ (the probability of $|P_k\mathcal{L}_\lambda(f)| &gt; C/\sqrt{k}$ even if $P\mathcal{L}_\lambda(f) \le r$).
+Hence, with probability at least $\frac{1}{12}$ over choice of samples $\{X_i\}_{i=1}^k$, &ldquo;bad&rdquo; target $T_\lambda$ gives
+$$
+P\mathcal{L}_\lambda(f) &gt; r \sim \frac{\beta}{\sqrt{k}},
+$$
+which gives a simple proof of Theorem 1.2<sup id="fnref:8"><a href="#fn:8" class="footnote-ref" role="doc-noteref">8</a></sup>.
+I summarize the above intuition in the following animation.
+<figure><img src="/img/201802/excess-loss-behavior.gif" width="600px"/>
+</figure>
+</p>
+<p>The key ingredient is Berry-Esséen Theorem (Theorem 3.7), which gives convergence rate of the central limit theory.
+Afterwards, I will go through some important parts in the proofs individually, focusing on parts difficult to follow (for me).</p>
+<h2 id="theorem-32-main-body-of-part1">Theorem 3.2 (main body of Part1)</h2>
+<p>The main claim of Part1 is stated in the following theorem.</p>
+<p><strong>Theorem 3.2</strong> Let $F$ be a classof functions that is compatible with the norm of $E$ and set $F_{\lambda,r} = \{f \mid P\mathcal{L}_\lambda(f) \le r\}$.
+For every $\alpha,u &gt; 0$ there is an integer $k_0$ and $\beta \in (0,u]$ such that for $k \ge k_0$, with probability $\frac{5}{6}$,
+$$
+\sup_{f \in F_{\alpha/\sqrt{k},\beta/\sqrt{k}}} |P_k\mathcal{L}_{\alpha/\sqrt{k}}(f)| \le \frac{2u}{\sqrt{k}}.
+$$</p>
+<p>Intuitively, for $\lambda \sim \alpha/\sqrt{k}$, if the expected excess loss $P\mathcal{L}_\lambda(f) \le \beta/\sqrt{k}$,
+then the empirical excess loss $|P_k\mathcal{L}_\lambda(f)| \le 2u/\sqrt{k}$ with high probability.
+This fact combined with Part2 (Lemma 3.9) shows for a certain case $P_k\mathcal{L}_\lambda(f) \le -C/\sqrt{k}$,
+and that $P\mathcal{L}_\lambda(f) &gt; \beta/\sqrt{k}$.</p>
+<p>Let&rsquo;s follow the proof using Lemma 3.3.
+Actually, most of the parts of the proof of Theorem 3.2 in the technical report is clear except Equation (3.2),
+which I want to clarify here:
+$$
+\begin{align}
+\sup_{f \in F_{\lambda,r}} |P_k\mathcal{L}_\lambda(f)|
+&amp; \le \sup_{f \in F_{\lambda,r}} |P\mathcal{L}_\lambda(f)| + |(P_k - P)\mathcal{L}_\lambda(f)| \\\\
+&amp; \le r + \sup_{f \in F_{\lambda,r}} |(P_k - P)\mathcal{L}_\lambda(f)| \\\\
+&amp; \le r + \mathbb{E}_X \sup_{f \in F_{\lambda,r}} |(P_k - P)\mathcal{L}_\lambda(f)| + \frac{c_\text{conc}}{\sqrt{k}},
+\end{align}
+$$
+where the first inequality is the triangular inequality, the second inequality is given by the condition $f \in F_{\lambda,r}$
+and the third inequality is given by concentration inequalities, such as McDiarmid&rsquo;s inequality:
+$$
+P_k\Psi \le P\Psi + \sqrt{\frac{M\log(2/\delta)}{2k}} \qquad \text{with probability at least $1-\delta$},
+$$
+where for any $\delta \in (0, 1)$, $M$ is a constant depending on boundedness of a functional $\Psi$.
+Here we set $\Psi = \sup|(P_k - P)\mathcal{L}_\lambda(f)|$ and $\delta = \frac{1}{6}$, then $c_\text{conc}$ is obtained as $\sqrt{M\log(12) / 2}$.</p>
+<p>The following part of the proof of Theorem 3.2 is not so difficult.
+In fact, the confidence term $c_\text{conc}/\sqrt{k}$ is missing on the right hand side of Equation (3.2), I think.
+Fortunately, the order of the confidence term is still $1/\sqrt{k}$, we can obtain the same upper bound with the original Theorem 3.2.</p>
+<h2 id="berry-esseacuteen-theorem-theorem-37-rarr-corollary-38">Berry-Esséen Theorem (Theorem 3.7) → Corollary 3.8</h2>
+<p>Berry-Esséen Theorem gives actual convergence rate of the central limit theory.</p>
+<p><strong>Theorem 3.7 (Berry-Esséen Theorem)</strong>
+Let $\{\xi_i\}_{i=1}^k$ be i.i.d. random variables with mean 0 and variance $\sigma^2$,
+$F_k(x)$ be the distribution function of $\frac{1}{\sigma\sqrt{k}}\sum_{i=1}^k\xi_i$
+and $\Phi(x)$ be the distribution function of the standard Gaussian.
+Then, for some constanct $c$,
+$$
+\sup_{x\in\mathbb{R}}|F_k(x) - \Phi(x)| \le c\frac{\mathbb{E}|\xi_1|^3}{\sigma^3\sqrt{k}}.
+$$</p>
+<p>B-E Theorem states $F_k(x)$ converges to $\Phi(x)$ in distribution, and its rate is $c\mathbb{E}|\xi_1|^3/\sigma^3\sqrt{k}$.
+Using this theorem, we can tell the left tail probability of $F_k(x)$.</p>
+<p><strong>Corollary 3.8</strong>
+Let $g$ be a random function with variance $\sigma^2$ and finite third moment.
+Then, there exists $k_1$ depending only on $\sigma$ and $\mathbb{E}|g|^3$, and a constant $C_2$
+such that for all $k \ge k_1$, with probability at least $\frac{1}{4}$ over the choice of $\{X_i\}_{i=1}^k$,
+$$
+\frac{1}{k}\sum_{i=1}^kg(X_i) \le \mathbb{E}g - C_2\frac{\sigma}{\sqrt{k}}.
+$$</p>
+<p>This corollary can simply be obtained by setting $C_2$ as the following figure.
+<figure><img src="/img/201802/berry-esseen-application.png" width="600px"/>
+</figure>
+
+The green line shows the distribution function of $\frac{1}{\sigma\sqrt{k}}\sum_{i=1}^k(g(X_i)-\mathbb{E}g)$.
+Thus, its left tail probability for $k \ge k_1$ is slightly larger than $\frac{1}{4}$.
+The choice of value $\frac{1}{4}$ does not have special meaning, just saying $g$ goes to &ldquo;very negative&rdquo; with certain probability.</p>
+<h2 id="construction-of-bad-target-main-body-of-part2">Construction of &ldquo;Bad&rdquo; Target (main body of Part2)</h2>
+<p>Back to Theorem 3.2, most of functions $f$ with small expected excess loss $P\mathcal{L}_\lambda(f) \le r$ gives empirical excess loss concentrated on $0$,
+that is, $|P_k\mathcal{L}_\lambda(f)| \le 2u/\sqrt{k}$ with high probability.
+In this section, a &ldquo;bad&rdquo; target, i.e., $P_k\mathcal{L}_\lambda(f) \le -C/\sqrt{k}$ even if $P\mathcal{L}_\lambda(f)$ is small.
+Such a bad target results in the lower bound of ERM convergence rate $O(1/\sqrt{k})$.
+To construct a bad target, Corollary 3.8 will be applied for $g = \mathcal{L}_\lambda(f)$.
+Since $\mathbb{E}\mathcal{L}_\lambda(f) \sim 1/\sqrt{k}$ can be confirmed, $P_k\mathcal{L}_\lambda(f) \le -C/\sqrt{k}$ will be obtained.</p>
+<p>Recall that we can take $T \in N(F,E)$ (see the supremum condition in Theorem 1.2),
+which means $T$ has more than one best approximator.
+Let&rsquo;s take $f_1$ as other (fixed) approximator than $f_*$ (please refer to the figure in <a href="#notations">Notation</a>).</p>
+<p><strong>Lemma 3.9</strong>
+There exist constants $C_3$, $C_4$, $\lambda_0$ and $k_1$ depending only on $\rho=\|T-f_*\|$, $\|\phi\|_\text{lip}$, $\|\ell\|_\text{lip}$, $D_3=\sup_{f \in F}\|T-f\|_{L_3(\mu)}$, $\Delta=\mathbb{E}|\mathcal{L}(f_1)|$
+such that for all $\lambda \in [0, \lambda_0]$,</p>
+<ol>
+<li>$\mathbb{E}\mathcal{L}_\lambda(f_1) \le 2\lambda\rho\|\phi\|_\text{lip}$</li>
+<li>$\text{var}(\mathcal{L}_\lambda(f_1)) \ge \Delta^2 / 4$</li>
+<li>$\forall k \ge k_1, \lambda_k \ge \min\{\lambda_0, C_3/\sqrt{k}\}$, with probability at least $\frac{1}{4}$, $P_k\mathcal{L}_\lambda(f_1) \le -\frac{C_4}{\sqrt{k}}$</li>
+</ol>
+<p>The first statement holds only for best approximators of $T$:
+$$
+\begin{align}
+\mathbb{E}\mathcal{L}_\lambda(f_1)
+&amp;\le \phi(\|T_\lambda - f_1\|) - \phi(\|T_\lambda - f_*\|) \\\\
+&amp;= (\phi(\|T_\lambda - f_1\|) - \phi(\|T - f_1\|)) + (\phi(\|T - f_*\|) - \phi(\|T_\lambda - f_*\|)) \\\\
+&amp;\le 2\|\phi\|_\text{lip} \|T - T_\lambda\| \\\\
+&amp;= 2\lambda\|\phi\|_\text{lip}\|T - f_*\| \\\\
+&amp;= 2\lambda\rho\|\phi\|_\text{lip},
+\end{align}
+$$
+where the equality in the second line holds only for best approximators $f_1$ ($\|T - f_1\| = \|T - f_*\|$).
+The first inequality follows Assumption 2.1 (please refer to the original report).</p>
+<p>The third statement follows Corollary 3.8, because $\mathbb{E}\mathcal{L}_\lambda(f_1)$ is upper bounded by $2C_3\rho\|\phi\|_\text{lip}/\sqrt{k}$ when $\lambda$ is small enough.</p>
+<p>The points are summarized as follows.</p>
+<ul>
+<li>There is a target $T$ which has more than one best approximation.</li>
+<li>For such $T$, there is a target $T_{C_3/\sqrt{k}}$ which gives &ldquo;very negative&rdquo; empirical excess loss on the empirical minimizer.</li>
+</ul>
+<p>Here, &ldquo;very negative&rdquo; means smaller than $-C_4/\sqrt{k}$.</p>
+<h2 id="epilogue">Epilogue</h2>
+<p>Theorem 3.10 can simply be obtained by the combination of Theorem 3.2 and Lemma 3.9.
+$P_k\mathcal{L}_\lambda(f_1)$ goes to very negative with probability at least $\frac{1}{4}$ (Lemma 3.9),
+while it goes to very negative in the usual case (i.e., the case $P\mathcal{L}_\lambda(f) \le c_2/\sqrt{k}$) with probability at most $\frac{1}{6}$ (Theorem 3.2).
+Combining them, the unusual case $P\mathcal{L}_\lambda(f_1) \ge c_2/\sqrt{k}$ happens with probability at least $\frac{1}{12}$.
+This probability does not vanish because of Berry-Esséen Theorem.
+The animation in <a href="#outline">Outline of Proof</a> hopefully describes intuition well.</p>
+<p>Finally, taking the expectation over $\{X_i\}_{i=1}^k$ and taking the supremum of $T \in \mathcal{T}$,
+Theorem 3.10 reduces to Theorem 1.2.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p><a href="https://papers.nips.cc/paper/5509-analysis-of-learning-from-positive-and-unlabeled-data.pdf">Analysis of Learning from Positive and Unlabeled Data (du Plessis et al., NIPS2014)</a>&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p><a href="http://proceedings.mlr.press/v70/sakai17a/sakai17a.pdf">Semi-Supervised Classification Based on Classification from Positive and Unlabeled Data (Sakai et al., ICML2017)</a>&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p><a href="https://pdfs.semanticscholar.org/a4c2/462cecc63f78231ddf738718037bd973e87b.pdf">Lower bounds for the empirical minimization algorithm (Mendelson, 2008)</a>&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a>&#160;<a href="#fnref1:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p><a href="https://pdfs.semanticscholar.org/9832/4eee3dd4f04b269458fedd13648c88df966c.pdf">On Information-Maximization Clustering: Tuning Parameter Selection and Analytic Solution (Sugiyama et al., ICML2011)</a>&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>In fact, if a zero-error classifier exists and this is included in the specified model, we can achieve faster rate than $O(n^{-\frac{1}{2}})$. I have to exclude this case because the optimality discussed in this article does not indicate such a specific assumption, rather the case without any strong assumption.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>For example, $p$-loss is the squared loss $\ell(x,z) = (x - z)^2$ when $p=2$.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>$P_k$ and $P$ are commonly used notations in discussion of the empirical process.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:8">
+<p>There are no special meanings in concrete probability values $\frac{1}{4}$ and $\frac{5}{6}$, just indicating certain probability and high probability, respectively. These values depend on the constants $C$, and are determined when concentration inequalities or central limit theory are applied.&#160;<a href="#fnref:8" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+        
+      </div>
+      <div class="paginator">
+        
+        <a></a>
+        
+        
+        <a class="link" href="https://hermite.jp/post/empirical-process-chapter-2/">next →</a>
+        
+      </div>
+      <div class="comment">
+        
+      </div>
+      
+    </main>
+    <footer id="footer">
+  <div>
+    <span>© Han Bao / Last updated: 2021-04-11</span>
+  </div>
+
+  <div class="footnote">
+    <span></span>
+  </div>
+</footer>
+
+  </div>
+  
+
+<link media="screen" rel="stylesheet" href="https://hermite.jp/css/main.css" />
+
+
+
+
+
+</body>
+
+</html>
